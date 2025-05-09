@@ -13,7 +13,7 @@ def run_part1(n_components_pca=None, visualize=False):
     N_INNER = 10
     N_OUTER = 10
 
-    base_path = "/Users/linusjuni/Documents/General Engineering/6. Semester/Mathematical Modelling/Assignments/mathematical-modelling-linear-classification/"
+    base_path = "/Users/askhasle/Documents/GitHub/mathematical-modelling-linear-classification?fbclid=IwZXh0bgNhZW0CMTEAAR4RscCjxDMDP6JY_FFo9OmX-6zw3rEH5aM9SfZn8vUvl7zQZEwZgmj3tH9Pxg_aem__KVEWNgvSE-K9QRLML9l3Q"
     data_path = os.path.join(base_path, "data")
     model_suffix = "_pca" if n_components_pca is not None else ""
     model_save_path = os.path.join(base_path, "models", f"part_1_logistic_regression_model{model_suffix}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.joblib")

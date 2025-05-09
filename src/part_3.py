@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 
 from data_utils import load_data_with_histograms_of_orientation
 from model_utils import nested_cross_validation, train_model, evaluate_model, save_model, load_model
-from visualization_utils import visualize_weights, visualize_lambda_selection, visualize_performance_by_lambda
+from visualization_utils import visualize_weight_from_feature_vector, visualize_lambda_selection, visualize_performance_by_lambda
 
 def run_part3(n_components_pca=None, visualize=False):
 
