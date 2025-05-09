@@ -9,10 +9,10 @@ from visualization_utils import visualize_weights, visualize_lambda_selection, v
 
 def run_part1():
 
-    N_INNER = 2
-    N_OUTER = 2
+    N_INNER = 10
+    N_OUTER = 10
 
-    base_path = "/Users/linusjuni/Documents/General Engineering/6. Semester/Mathematical Modelling/Assignments/mathematical-modelling-linear-classification/"
+    base_path = "/Users/askhasle/Documents/GitHub/mathematical-modelling-linear-classification?fbclid=IwZXh0bgNhZW0CMTEAAR4RscCjxDMDP6JY_FFo9OmX-6zw3rEH5aM9SfZn8vUvl7zQZEwZgmj3tH9Pxg_aem__KVEWNgvSE-K9QRLML9l3Q"
     data_path = os.path.join(base_path, "data")
     model_save_path = os.path.join(base_path, "models", f"part_1_logistic_regression_model_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.joblib")
 
@@ -25,11 +25,11 @@ def run_part1():
     X_test, y_test = load_data(test_path)
 
     lambda_values = np.concatenate([
-        #np.logspace(-5, -3, 5),
-        #np.linspace(0.001, 0.1, 10), 
-        #np.linspace(0.1, 1, 5),
+        np.logspace(-5, -3, 5),
+        np.linspace(0.001, 0.1, 10), 
+        np.linspace(0.1, 1, 5),
         np.linspace(1, 10, 5),
-        #np.linspace(10, 1000, 5)
+        np.linspace(10, 1000, 5)
     ])
     lambda_values = np.unique(lambda_values.round(8))
 

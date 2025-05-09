@@ -102,3 +102,132 @@ def visualize_weight_from_feature_vector(model, image_shape=(224, 224), pixels_p
                    labelbottom=False, labelleft=False, labeltop=False, labelright=False) 
 
     plt.show()
+
+
+def visualize_unsigned_orientations(model, image_shape=(224, 224), pixels_per_cell=(32, 32), orientations=9):
+    weights = model.coef_[0]
+
+    n_cells_y = image_shape[0] // pixels_per_cell[0]
+    n_cells_x = image_shape[1] // pixels_per_cell[1]
+    n_cells = n_cells_y * n_cells_x
+
+    expected_len = n_cells * orientations
+    if len(weights) != expected_len:
+        print(f"Weight vector length mismatch: {len(weights)} != {expected_len}")
+        return
+
+    max_weight = np.max(np.abs(weights))
+    heatmap = np.zeros((n_cells_y, n_cells_x))
+
+    plt.figure(figsize=(10, 10))
+    ax = plt.gca()
+
+    angle_step = np.pi / orientations  # 0–π for unsigned gradients
+    line_half_len = min(pixels_per_cell) * 0.4  # Half-length for symmetric line
+
+    for idx in range(n_cells):
+        y = idx // n_cells_x
+        x = idx % n_cells_x
+
+        start = idx * orientations
+        end = start + orientations
+        cell_weights = weights[start:end]
+
+        heatmap[y, x] = np.sum(np.abs(cell_weights))
+
+        center_x = x * pixels_per_cell[1] + pixels_per_cell[1] / 2
+        center_y = y * pixels_per_cell[0] + pixels_per_cell[0] / 2
+
+        for ori in range(orientations):
+            angle = ori * angle_step
+            weight = cell_weights[ori]
+            opacity = np.abs(weight) / max_weight if max_weight > 0 else 0
+
+            dx = np.cos(angle) * line_half_len
+            dy = -np.sin(angle) * line_half_len  # Flip Y-axis for image display
+
+            # Draw a symmetric line segment centered at the cell
+            ax.plot([center_x - dx, center_x + dx],
+                    [center_y - dy, center_y + dy],
+                    color=(1, 1, 1, opacity), linewidth=1.5)
+
+    upscaled_heatmap = np.kron(heatmap, np.ones(pixels_per_cell))
+    im = plt.imshow(upscaled_heatmap, cmap='viridis', extent=(0, image_shape[1], image_shape[0], 0))
+    plt.colorbar(im, label='Aggregated Absolute Weight per Cell')
+
+    ax.set_xticks(np.arange(0, image_shape[1] + 1, pixels_per_cell[1]), minor=True)
+    ax.set_yticks(np.arange(0, image_shape[0] + 1, pixels_per_cell[0]), minor=True)
+    ax.grid(which='minor', color='red', linestyle='-', linewidth=1, alpha=0.5)
+    ax.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
+                   labelbottom=False, labelleft=False)
+
+    plt.title('HOG Orientation Visualization (Unsigned, 0–180°)')
+    plt.xlabel('Image Width (pixels)')
+    plt.ylabel('Image Height (pixels)')
+    plt.show()
+
+def visualize_unsigned_orientations_max(model, image_shape=(224, 224), pixels_per_cell=(32, 32), orientations=9):
+    weights = model.coef_[0]
+
+    n_cells_y = image_shape[0] // pixels_per_cell[0]
+    n_cells_x = image_shape[1] // pixels_per_cell[1]
+    n_cells = n_cells_y * n_cells_x
+
+    expected_len = n_cells * orientations
+    if len(weights) != expected_len:
+        print(f"Weight vector length mismatch: {len(weights)} != {expected_len}")
+        return
+
+    max_weight = np.max(np.abs(weights))
+    heatmap = np.zeros((n_cells_y, n_cells_x))
+
+    plt.figure(figsize=(10, 10))
+    ax = plt.gca()
+
+    angle_step = np.pi / orientations  # 0–π for unsigned gradients
+    line_half_len = min(pixels_per_cell) * 0.4  # Half-length for symmetric line
+
+    for idx in range(n_cells):
+        y = idx // n_cells_x
+        x = idx % n_cells_x
+
+        start = idx * orientations
+        end = start + orientations
+        cell_weights = weights[start:end]
+
+        # Set the heatmap value to the max weight in this cell
+        heatmap[y, x] = np.max(np.abs(cell_weights))
+
+        center_x = x * pixels_per_cell[1] + pixels_per_cell[1] / 2
+        center_y = y * pixels_per_cell[0] + pixels_per_cell[0] / 2
+
+        for ori in range(orientations):
+            angle = ori * angle_step
+            weight = cell_weights[ori]
+            opacity = np.abs(weight) / max_weight if max_weight > 0 else 0
+
+            dx = np.cos(angle) * line_half_len
+            dy = -np.sin(angle) * line_half_len  # Flip Y-axis for image display
+
+            # Draw a symmetric line segment centered at the cell
+            ax.plot([center_x - dx, center_x + dx],
+                    [center_y - dy, center_y + dy],
+                    color=(1, 1, 1, opacity), linewidth=1.5)
+
+    # Upscale the heatmap for better resolution
+    upscaled_heatmap = np.kron(heatmap, np.ones(pixels_per_cell))
+    
+    # Plot the heatmap
+    im = plt.imshow(upscaled_heatmap, cmap='viridis', extent=(0, image_shape[1], image_shape[0], 0))
+    plt.colorbar(im, label='Max Absolute Weight per Cell')
+
+    ax.set_xticks(np.arange(0, image_shape[1] + 1, pixels_per_cell[1]), minor=True)
+    ax.set_yticks(np.arange(0, image_shape[0] + 1, pixels_per_cell[0]), minor=True)
+    ax.grid(which='minor', color='red', linestyle='-', linewidth=1, alpha=0.5)
+    ax.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False,
+                   labelbottom=False, labelleft=False)
+
+    plt.title('HOG Orientation Visualization (Unsigned, 0–180°)')
+    plt.xlabel('Image Width (pixels)')
+    plt.ylabel('Image Height (pixels)')
+    plt.show()
